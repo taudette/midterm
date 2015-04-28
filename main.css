@@ -2,13 +2,57 @@
 	display: none;
 }
 
-li{
+/*li{
 	list-style-type: none;
+}*/
+
+
+input{
+	height: 34px;
+	width: 152px;
 }
-
-
-
 .form-control{
 	display: inline;
 	width: 152px;
+	height: 34px;
 }
+
+#map-canvas {
+        width: 700px;
+        height: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        float: none;
+      }
+
+.new-request-form{
+	float: left;
+	margin-left: 3em;
+	
+}
+
+#datetimepicker1{
+	width:152px;
+}
+
+var styles = [
+  {
+    stylers: [
+      { hue: "#00ffe6" },
+      { saturation: -20 }
+    ]
+  },{
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      { lightness: 100 },
+      { visibility: "simplified" }
+    ]
+  },{
+    featureType: "road",
+    elementType: "labels",
+    stylers: [
+      { visibility: "off" }
+    ]
+  }
+];

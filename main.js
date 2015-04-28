@@ -8,7 +8,8 @@
 
 
 //declare Request constructor
-var Request = function (name, state, area, style, grades, contact){
+var Request = function (date, name, state, area, style, grades, contact){
+	this.date = date;
 	this.name = name;
 	this.state = state;
 	this.area = area;
@@ -26,9 +27,11 @@ Request.prototype.render = function(){
 		this.el = $('#request-tpl')
 		.clone()
 		.attr('id', null);
-	}
 
-	this.el.find ('.request-name').text(this.name);
+
+	}
+	this.el.find('.request-date').text(this.date);
+	this.el.find('.request-name').text(this.name);
 	this.el.find('.request-state').text(this.state);
 	this.el.find('.request-area').text(this.area);
 	this.el.find('.request-style').text(this.style);
@@ -37,6 +40,33 @@ Request.prototype.render = function(){
 
 	return this.el;
 };
+
+
+
+
+
+
+
+// Function for adding a marker to the page.
+ Request.prototype.renderMarker = function(map) {
+ 	var request = this;
+    this.marker = new google.maps.Marker({});
+    geocoder.geocode( { 'address': this.area + ',' + this.state}, function(results, status) {
+      // map.setCenter(results[0].geometry.location);
+      // var marker = new google.maps.Marker({
+      //     map: map,
+      //     position: results[0].geometry.location
+      // });
+console.log(results, status, request);
+	request.marker.setPosition(results[0].geometry.location);
+	request.marker.setMap(map);
+   });
+
+  
+    };
+
+
+
 
 //make library of requests
 var RequestLibrary = function (name){
@@ -51,13 +81,20 @@ RequestLibrary.prototype.addRequest = function(request){
 	this.render();
 };
 
+RequestLibrary.prototype.renderMarkers = function(map){
+	for (var i=0; i<this.requests.length; i++){
+		this.requests[i].renderMarker(map);
+	}
+};
+
+
 //Render Library to dom
 RequestLibrary.prototype.render = function() {
 	if (this.el === undefined) {
 		this.el = $('#request-library-tpl')
 			.clone()
 			.attr('id', null);
-			
+		
 		var originalLibrary = this;
 
 		this.el.find('.new-request-form').on('submit',function(e){
@@ -66,6 +103,7 @@ RequestLibrary.prototype.render = function() {
 
 
 			//grabbing values from inputs and changing the value of the form
+			var requestDate = $(this).find('[date = request-date]').val();
 			var requestName = $(this).find('[name = request-name]').val();
 			var requestState = $(this).find('[name = request-state]').val();
 			var requestArea = $(this).find('[name = request-area]').val();
@@ -78,7 +116,8 @@ RequestLibrary.prototype.render = function() {
 			var newRequest = new Request(requestName, requestState, requestArea, requestStyle, requestGrades, requestContact);
 			originalLibrary.addRequest(newRequest);
 			//clear form after submitting
-			$(".name, .state, .area, .style, .grades, .contact").val('');
+			$(".date, .name, .state, .area, .style, .grades, .contact").val('');
+
 
 		});
 			
@@ -94,20 +133,82 @@ RequestLibrary.prototype.render = function() {
 	return this.el;
 	};
 
-	var firstRequest = new Request ('Tyler Audette', 'CO', 'Boulder', 'Sport', '5.12 - 5.13', 'tyleraudette@yahoo.com');
+
+
+
+
+
+	var firstRequest = new Request ('05/21/2015', 'Tyler Audette', 'utah', 'Boulder Canyon', 'Sport', '5.12 - 5.13', 'tyleraudette5@gmail.com');
+	var secondRequest = new Request ('05/01/2015','Random Dude', 'MA', 'Clear Creek Canyon', 'Sport', '5.11 - 5.12', '867-5309');
+	var thirdRequest = new Request ('05/10/2015','Dirty Hippy', 'CO', 'Eldorado Canyon', 'Trad', '5.10 - 5.11', 'White van outside The Spot');
+	var fourthRequest = new Request ('05/20/2015','Strong Man', 'CO', 'Rocky Mountain National Park', 'Bouldering', 'v13', 'myspace.com/rockclimber33');
+	var fifthRequest = new Request ('05/05/2015','Adam Ondra', 'KANSAS', 'Virgin River Gorge', 'Sport', '5.14 - 5.15', 'iscreamalot@hotmail.com');
+	var sixthRequest = new Request ('05/10/2015','Alex Honnold', 'CA', 'Yosemite', 'Scary-Trad', '5.13 - 5.14', 'ropesareforbabies@gmail.com');
+	var seventhRequest = new Request ('04/30/2015','Chris Sharma', 'NV', 'Clark Canyon', 'Sport', '5.14 - 5.15', 'Sattelite Phone');
+	var eighthRequest = new Request ('04/29/2015','Daniel Woods', 'CO', 'Rocky Mountain National Park', 'Bouldering', 'v15', 'iloverocks@gmail.com');
+
 	var myLibrary = new RequestLibrary('');
 	myLibrary.addRequest(firstRequest);
+	myLibrary.addRequest(secondRequest);
+    myLibrary.addRequest(thirdRequest);
+	myLibrary.addRequest(fourthRequest);
+	myLibrary.addRequest(fifthRequest);
+	myLibrary.addRequest(sixthRequest);
+    myLibrary.addRequest(seventhRequest);
+	myLibrary.addRequest(eighthRequest);
 	var requestArray = myLibrary.requests;
 
-	$('#about').append(myLibrary.render());
+
+
+
+	 $('#about').append(myLibrary.render());
+
+  
+
+
+//when window finishes loading add the map
+google.maps.event.addDomListener(window, 'load', initialize);
+//maps///////////
+function initialize() {
+	geocoder = new google.maps.Geocoder();
+	var mapCanvas = document.getElementById('map-canvas');
+	var mapOptions = {
+		zoom: 4,
+		center: new google.maps.LatLng(39.8282, -98.5795), // New York
+		styles: [{
+			"stylers": [{
+				"hue": "#007fff"
+			}, {
+				"saturation": 89
+			}]
+		}, {
+			"featureType": "water",
+			"stylers": [{
+				"color": "#ffffff"
+			}]
+		}, {
+			"featureType": "administrative.country",
+			"elementType": "labels",
+			"stylers": [{
+				"visibility": "off"
+			}]
+		}]
+
+
+	};
+	map = new google.maps.Map(mapCanvas, mapOptions); 
+	
+	google.maps.event.addListenerOnce(map, 'idle', function(){
+		myLibrary.renderMarkers(map);
+    // do something only the first time the map is loaded
+});
+}
 
 
 
 
 
-
-
-
+	
 
 
 
