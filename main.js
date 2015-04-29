@@ -16,9 +16,7 @@ var Request = function (date, name, state, area, style, grades, contact){
 	this.style = style;
 	this.grades = grades;
 	this.contact = contact;
-
 	this.render();
-
 };
 
 //Generate dom element for requests
@@ -27,8 +25,6 @@ Request.prototype.render = function(){
 		this.el = $('#request-tpl')
 		.clone()
 		.attr('id', null);
-
-
 	}
 	this.el.find('.request-date').text(this.date);
 	this.el.find('.request-name').text(this.name);
@@ -37,11 +33,8 @@ Request.prototype.render = function(){
 	this.el.find('.request-style').text(this.style);
 	this.el.find('.request-grades').text(this.grades);
 	this.el.find('.request-contact').text(this.contact);
-
 	return this.el;
 };
-
-
 
 
 // Function for adding a marker to the page.
@@ -50,18 +43,15 @@ Request.prototype.render = function(){
 	 	var request = this;
 	    this.marker = new google.maps.Marker({});
 	    geocoder.geocode( { 'address': this.area + ',' + this.state}, function(results, status) {
-	     
-		request.marker.setPosition(results[0].geometry.location);
-		request.marker.setMap(map);
-  		});
-
+			request.marker.setPosition(results[0].geometry.location);
+			request.marker.setMap(map);
+	  		});
 	    // info on click//////
 	    var marker = this.marker;
 	    var contentString = request.date + '<br>' + request.name + '<br>' + request.area +  '<br>' + request.style +'<br>' + request.grades +'<br>' + request.contact ;
 		var infowindow = new google.maps.InfoWindow({
-		      content: contentString,
-		     
-		  });
+		      content: contentString,		     
+		 });
   		 google.maps.event.addListener(this.marker, 'click', function() {
   		 console.log('clicked');
     	 infowindow.open(map, marker);
@@ -118,12 +108,9 @@ RequestLibrary.prototype.render = function(listOverride) {
 		
 		var originalLibrary = this;
 
-
 		this.el.find('.new-request-form').on('submit',function(e){
 			e.preventDefault();
 			console.log('submitted');
-
-
 
 			//grabbing values from inputs and changing the value of the form
 			var requestDate = $(this).find('[name = request-date]').val();
@@ -133,7 +120,6 @@ RequestLibrary.prototype.render = function(listOverride) {
 			var requestStyle = $(this).find('[name = request-style]').val();
 			var requestGrades = $(this).find('[name = request-grades]').val();
 			var requestContact = $(this).find('[name = request-contact]').val();
-
 
 			//generate new request instance
 			var newRequest = new Request(requestDate, requestName, requestState, requestArea, requestStyle, requestGrades, requestContact);
@@ -164,11 +150,7 @@ RequestLibrary.prototype.render = function(listOverride) {
 	return this.el;
 	};
 
-
-
-
-
-
+//////hardcoded climbers
 	var firstRequest = new Request ('05/21/2015', 'Tyler', 'Utah', 'Maple Canyon', 'Sport', '5.12 - 5.13', 'tyleraudette5@gmail.com');
 	var secondRequest = new Request ('05/01/2015','Random Dude', 'Massachusetts', 'Clear Creek Canyon', 'Sport', '5.11 - 5.12', '867-5309');
 	var thirdRequest = new Request ('05/10/2015','Dirty Hippy', 'Colorado', 'Eldorado Canyon', 'Trad', '5.10 - 5.11', 'White van outside The Spot');
@@ -188,19 +170,13 @@ RequestLibrary.prototype.render = function(listOverride) {
     myLibrary.addRequest(seventhRequest);
 	myLibrary.addRequest(eighthRequest);
 	var requestArray = myLibrary.requests;
-
-
-
-
-	 $('body').append(myLibrary.render());
+/////Render everything to body///// 
+	$('#contact').append(myLibrary.render());
 
   
-
+//maps///////////
 var geocoder;
 var map;
-//when window finishes loading add the map
-
-//maps///////////
 function initialize() {
 	geocoder = new google.maps.Geocoder();
 
@@ -226,21 +202,19 @@ function initialize() {
 				"visibility": "off"
 			}]
 		}]
-
-
 	};
 
 	map = new google.maps.Map(mapCanvas, mapOptions); 
 
 	// Create the search box and link it to the UI element.
-  var input = /** @type {HTMLInputElement} */(
+  	var input = /** @type {HTMLInputElement} */(
       document.getElementById('pac-input'));
-  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
     var searchBox = new google.maps.places.SearchBox(
     /** @type {HTMLInputElement} */(input));
 
 
- google.maps.event.addListener(searchBox, 'places_changed', function() {
+ 	google.maps.event.addListener(searchBox, 'places_changed', function() {
     var places = searchBox.getPlaces();
     
     // sorted list//////
@@ -251,17 +225,10 @@ function initialize() {
     console.log(stateOnly);
   	myLibrary.renderFilter(stateOnly);
 
-
-
-
-
-
-
     if (places.length === 0) {
       return;
     }
  
-
     //search function//
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0, place; place = places[i]; i++) {
@@ -275,9 +242,17 @@ function initialize() {
 
       bounds.extend(place.geometry.location);
     }
+    // Don't zoom in too far on only one marker
+    if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+       var extendPoint1 = new google.maps.LatLng(bounds.getNorthEast().lat() + 0.08, bounds.getNorthEast().lng() + 0.08);
+       var extendPoint2 = new google.maps.LatLng(bounds.getNorthEast().lat() - 0.08, bounds.getNorthEast().lng() - 0.08);
+       bounds.extend(extendPoint1);
+       bounds.extend(extendPoint2);
+    }
 
     map.fitBounds(bounds);
-  });
+    console.log(bounds);
+  	});
 
 
 	google.maps.event.addDomListener(window, 'load', initialize);
