@@ -93,9 +93,24 @@ RequestLibrary.prototype.renderMarkers = function(map){
 	}
 };
 
+RequestLibrary.prototype.renderFilter = function(stateOnly){	
+	function findState(Request){
+		if (Request.state === stateOnly){
+			return true;
+		}
+	}
+	var filtered = requestArray.filter(findState);
+	console.log(filtered);
+	$('.request-list').empty();
+
+	myLibrary.render(filtered);
+
+};
+
 
 //Render Library to dom
-RequestLibrary.prototype.render = function() {
+//pass a list to override via filtered
+RequestLibrary.prototype.render = function(listOverride) {
 	if (this.el === undefined) {
 		this.el = $('#request-library-tpl')
 			.clone()
@@ -135,8 +150,13 @@ RequestLibrary.prototype.render = function() {
 	}
 	//change lib name to given
 	this.el.find('.library.name').text(this.name);
+	/////over ride
+	var requests = this.requests;
+		if(listOverride){
+			requests = listOverride;
+		}
 
-	var requestElements = this.requests.map(function(request){
+	var requestElements = requests.map(function(request){
 		return request.render();
 	});
 
@@ -149,14 +169,14 @@ RequestLibrary.prototype.render = function() {
 
 
 
-	var firstRequest = new Request ('05/21/2015', 'Tyler Audette', 'utah', 'Boulder Canyon', 'Sport', '5.12 - 5.13', 'tyleraudette5@gmail.com');
-	var secondRequest = new Request ('05/01/2015','Random Dude', 'MA', 'Clear Creek Canyon', 'Sport', '5.11 - 5.12', '867-5309');
-	var thirdRequest = new Request ('05/10/2015','Dirty Hippy', 'CO', 'Eldorado Canyon', 'Trad', '5.10 - 5.11', 'White van outside The Spot');
-	var fourthRequest = new Request ('05/20/2015','Strong Man', 'CO', 'rifle mountain park', 'Bouldering', 'v13', 'myspace.com/rockclimber33');
-	var fifthRequest = new Request ('05/05/2015','Adam Ondra', 'KANSAS', 'Virgin River Gorge', 'Sport', '5.14 - 5.15', 'iscreamalot@hotmail.com');
-	var sixthRequest = new Request ('05/10/2015','Alex Honnold', 'CA', 'Yosemite', 'Scary-Trad', '5.13 - 5.14', 'ropesareforbabies@gmail.com');
-	var seventhRequest = new Request ('04/30/2015','Chris Sharma', 'NV', 'Clark Canyon', 'Sport', '5.14 - 5.15', 'Sattelite Phone');
-	var eighthRequest = new Request ('04/29/2015','Daniel Woods', 'CO', 'Rocky Mountain National Park', 'Bouldering', 'v15', 'iloverocks@gmail.com');
+	var firstRequest = new Request ('05/21/2015', 'Tyler', 'Utah', 'Maple Canyon', 'Sport', '5.12 - 5.13', 'tyleraudette5@gmail.com');
+	var secondRequest = new Request ('05/01/2015','Random Dude', 'Massachusetts', 'Clear Creek Canyon', 'Sport', '5.11 - 5.12', '867-5309');
+	var thirdRequest = new Request ('05/10/2015','Dirty Hippy', 'Colorado', 'Eldorado Canyon', 'Trad', '5.10 - 5.11', 'White van outside The Spot');
+	var fourthRequest = new Request ('05/20/2015','Strong Man', 'Colorado', 'rifle mountain park', 'Bouldering', 'v13', 'myspace.com/rockclimber33');
+	var fifthRequest = new Request ('05/05/2015','Adam Ondra', 'Nevada', 'Virgin River Gorge', 'Sport', '5.14 - 5.15', 'iscreamalot@hotmail.com');
+	var sixthRequest = new Request ('05/10/2015','Alex Honnold', 'California', 'Yosemite', 'Scary-Trad', '5.13 - 5.14', 'ropesareforbabies@gmail.com');
+	var seventhRequest = new Request ('04/30/2015','Chris Sharma', 'Nevada', 'Clark Canyon', 'Sport', '5.14 - 5.15', 'Sattelite Phone');
+	var eighthRequest = new Request ('04/29/2015','Daniel Woods', 'Colorado', 'Rocky Mountain National Park', 'Bouldering', 'v15', 'iloverocks@gmail.com');
 
 	var myLibrary = new RequestLibrary('');
 	myLibrary.addRequest(firstRequest);
@@ -172,16 +192,18 @@ RequestLibrary.prototype.render = function() {
 
 
 
-	 $('#intro').append(myLibrary.render());
+	 $('body').append(myLibrary.render());
 
   
 
-
+var geocoder;
+var map;
 //when window finishes loading add the map
-// google.maps.event.addDomListener(window, 'load', initialize);
+
 //maps///////////
 function initialize() {
 	geocoder = new google.maps.Geocoder();
+
 	var mapCanvas = document.getElementById('map-canvas');
 	var mapOptions = {
 		zoom: 4,
@@ -207,11 +229,58 @@ function initialize() {
 
 
 	};
+
 	map = new google.maps.Map(mapCanvas, mapOptions); 
 
+	// Create the search box and link it to the UI element.
+  var input = /** @type {HTMLInputElement} */(
+      document.getElementById('pac-input'));
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    var searchBox = new google.maps.places.SearchBox(
+    /** @type {HTMLInputElement} */(input));
 
 
-	
+ google.maps.event.addListener(searchBox, 'places_changed', function() {
+    var places = searchBox.getPlaces();
+    
+    // sorted list//////
+    var enteredplace = (places[0].formatted_address);
+    var locationStrung = String(enteredplace);
+    var split = locationStrung.split(',');
+    var stateOnly= split[0];
+    console.log(stateOnly);
+  	myLibrary.renderFilter(stateOnly);
+
+
+
+
+
+
+
+    if (places.length === 0) {
+      return;
+    }
+ 
+
+    //search function//
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0, place; place = places[i]; i++) {
+      var image = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25)
+      };
+
+      bounds.extend(place.geometry.location);
+    }
+
+    map.fitBounds(bounds);
+  });
+
+
+	google.maps.event.addDomListener(window, 'load', initialize);
 	google.maps.event.addListenerOnce(map, 'idle', function(){
 		myLibrary.renderMarkers(map);
     // do something only the first time the map is loaded

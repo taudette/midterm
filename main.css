@@ -1,17 +1,15 @@
-#templates{
+#templates {
 	display: none;
 }
 
-/*li{
-	list-style-type: none;
-}*/
+.padded-heading{
+  margin-right: auto;
+  margin-left: auto;
+  padding: 3em;
+  width: 100%;
 
-
-input{
-	height: 34px;
-	width: 152px;
 }
-.form-control{
+.form-control, input{
 	/*display: inline;*/
 	width: 152px;
 	height: 34px;
@@ -19,15 +17,14 @@ input{
 
 #map-canvas {
         width: 800px;
-        height: 550px;
-       
+        height: 550px;      
         margin-right: auto;
         float: none;
         margin-bottom: 50px;
       }
 
 .new-request-form{
-	float: left;
+	
 	margin-left: 3em;
 	
 }
@@ -37,16 +34,7 @@ input{
 }
 
 
-@media (min-width: 768px){
-/*  #left {
-    position: absolute;
-    top: 0px;
-    bottom: 0;
-    left: 0;
-    width: 75%;
-    overflow-y: scroll; 
-  }*/
-  
+@media (min-width: 768px){  
   #right {
     position: absolute;
     top: 15em;
@@ -57,12 +45,6 @@ input{
   }
 }
 
-/*#left {
- 
-  text-align: center;
-  height:100%;
-}*/
-
 #right {
   height:100%;
   text-align: -webkit-auto;
@@ -70,7 +52,7 @@ input{
 
 ol li{
 	list-style-type: none;
-	border: 1px solid black;
+	border-bottom: 1px solid black;
 	overflow: hidden;
 }
 
