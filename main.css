@@ -12,17 +12,18 @@ input{
 	width: 152px;
 }
 .form-control{
-	display: inline;
+	/*display: inline;*/
 	width: 152px;
 	height: 34px;
 }
 
 #map-canvas {
-        width: 700px;
-        height: 500px;
-        margin-left: auto;
+        width: 800px;
+        height: 550px;
+       
         margin-right: auto;
         float: none;
+        margin-bottom: 50px;
       }
 
 .new-request-form{
@@ -35,24 +36,46 @@ input{
 	width:152px;
 }
 
-var styles = [
-  {
-    stylers: [
-      { hue: "#00ffe6" },
-      { saturation: -20 }
-    ]
-  },{
-    featureType: "road",
-    elementType: "geometry",
-    stylers: [
-      { lightness: 100 },
-      { visibility: "simplified" }
-    ]
-  },{
-    featureType: "road",
-    elementType: "labels",
-    stylers: [
-      { visibility: "off" }
-    ]
+
+@media (min-width: 768px){
+/*  #left {
+    position: absolute;
+    top: 0px;
+    bottom: 0;
+    left: 0;
+    width: 75%;
+    overflow-y: scroll; 
+  }*/
+  
+  #right {
+    position: absolute;
+    top: 15em;
+    bottom: 0;
+    right: 5em;
+    overflow-y: scroll;
+    width: 17%;
   }
-];
+}
+
+/*#left {
+ 
+  text-align: center;
+  height:100%;
+}*/
+
+#right {
+  height:100%;
+  text-align: -webkit-auto;
+}
+
+ol li{
+	list-style-type: none;
+	border: 1px solid black;
+	overflow: hidden;
+}
+
+
+
+
+
+

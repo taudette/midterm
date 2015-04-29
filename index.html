@@ -79,12 +79,15 @@
     <section id="intro" class="intro-section">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-7" >
                     <h1>Find Climbing Partners</h1>
+                     <div class="col-sm-4">
+                  
+                    </div>
                   <!--   search button -->
                      
                     <div id="map-canvas" ></div>
-                    <a class="btn btn-default page-scroll" href="#about">Click Me to Scroll Down!</a>
+                   
                 </div>
             </div>
         </div>
@@ -94,7 +97,7 @@
     <section id="about" class="about-section">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-sm-12">
                     <h1></h1>
                 </div>
             </div>
@@ -212,10 +215,14 @@
                 
                 </form>
                 <!-- list of climbing requests -->
-                <ol class = "request-list list-inline "></ol>
+
+                <ol class = "request-list col-sm-4" id="right"></ol>
+
             </div>
             <!-- Make template for each request as li to end up in ul -->
+
             <li id = "request-tpl">
+
                 <ol>
                     <h6 class = "request-date">date</h6>
                     <h6 class = "request-name">name</h6>

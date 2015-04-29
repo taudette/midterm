@@ -172,7 +172,7 @@ RequestLibrary.prototype.render = function() {
 
 
 
-	 $('#about').append(myLibrary.render());
+	 $('#intro').append(myLibrary.render());
 
   
 
