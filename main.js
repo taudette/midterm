@@ -44,26 +44,30 @@ Request.prototype.render = function(){
 
 
 
-
-
-
 // Function for adding a marker to the page.
  Request.prototype.renderMarker = function(map) {
- 	var request = this;
-    this.marker = new google.maps.Marker({});
-    geocoder.geocode( { 'address': this.area + ',' + this.state}, function(results, status) {
-      // map.setCenter(results[0].geometry.location);
-      // var marker = new google.maps.Marker({
-      //     map: map,
-      //     position: results[0].geometry.location
-      // });
-console.log(results, status, request);
-	request.marker.setPosition(results[0].geometry.location);
-	request.marker.setMap(map);
-   });
+	if(!this.marker){
+	 	var request = this;
+	    this.marker = new google.maps.Marker({});
+	    geocoder.geocode( { 'address': this.area + ',' + this.state}, function(results, status) {
+	     
+		request.marker.setPosition(results[0].geometry.location);
+		request.marker.setMap(map);
+  		});
 
-  
-    };
+	    // info on click//////
+	    var marker = this.marker;
+	    var contentString = request.date + '<br>' + request.name + '<br>' + request.area +  '<br>' + request.style +'<br>' + request.grades +'<br>' + request.contact ;
+		var infowindow = new google.maps.InfoWindow({
+		      content: contentString,
+		     
+		  });
+  		 google.maps.event.addListener(this.marker, 'click', function() {
+  		 console.log('clicked');
+    	 infowindow.open(map, marker);
+ 		 });
+	}
+};
 
 
 
@@ -82,8 +86,10 @@ RequestLibrary.prototype.addRequest = function(request){
 };
 
 RequestLibrary.prototype.renderMarkers = function(map){
+	console.log(this.requests);
 	for (var i=0; i<this.requests.length; i++){
 		this.requests[i].renderMarker(map);
+	
 	}
 };
 
@@ -97,13 +103,15 @@ RequestLibrary.prototype.render = function() {
 		
 		var originalLibrary = this;
 
+
 		this.el.find('.new-request-form').on('submit',function(e){
 			e.preventDefault();
 			console.log('submitted');
 
 
+
 			//grabbing values from inputs and changing the value of the form
-			var requestDate = $(this).find('[date = request-date]').val();
+			var requestDate = $(this).find('[name = request-date]').val();
 			var requestName = $(this).find('[name = request-name]').val();
 			var requestState = $(this).find('[name = request-state]').val();
 			var requestArea = $(this).find('[name = request-area]').val();
@@ -113,8 +121,11 @@ RequestLibrary.prototype.render = function() {
 
 
 			//generate new request instance
-			var newRequest = new Request(requestName, requestState, requestArea, requestStyle, requestGrades, requestContact);
+			var newRequest = new Request(requestDate, requestName, requestState, requestArea, requestStyle, requestGrades, requestContact);
 			originalLibrary.addRequest(newRequest);
+			
+			originalLibrary.renderMarkers(map);
+
 			//clear form after submitting
 			$(".date, .name, .state, .area, .style, .grades, .contact").val('');
 
@@ -141,7 +152,7 @@ RequestLibrary.prototype.render = function() {
 	var firstRequest = new Request ('05/21/2015', 'Tyler Audette', 'utah', 'Boulder Canyon', 'Sport', '5.12 - 5.13', 'tyleraudette5@gmail.com');
 	var secondRequest = new Request ('05/01/2015','Random Dude', 'MA', 'Clear Creek Canyon', 'Sport', '5.11 - 5.12', '867-5309');
 	var thirdRequest = new Request ('05/10/2015','Dirty Hippy', 'CO', 'Eldorado Canyon', 'Trad', '5.10 - 5.11', 'White van outside The Spot');
-	var fourthRequest = new Request ('05/20/2015','Strong Man', 'CO', 'Rocky Mountain National Park', 'Bouldering', 'v13', 'myspace.com/rockclimber33');
+	var fourthRequest = new Request ('05/20/2015','Strong Man', 'CO', 'rifle mountain park', 'Bouldering', 'v13', 'myspace.com/rockclimber33');
 	var fifthRequest = new Request ('05/05/2015','Adam Ondra', 'KANSAS', 'Virgin River Gorge', 'Sport', '5.14 - 5.15', 'iscreamalot@hotmail.com');
 	var sixthRequest = new Request ('05/10/2015','Alex Honnold', 'CA', 'Yosemite', 'Scary-Trad', '5.13 - 5.14', 'ropesareforbabies@gmail.com');
 	var seventhRequest = new Request ('04/30/2015','Chris Sharma', 'NV', 'Clark Canyon', 'Sport', '5.14 - 5.15', 'Sattelite Phone');
@@ -167,7 +178,7 @@ RequestLibrary.prototype.render = function() {
 
 
 //when window finishes loading add the map
-google.maps.event.addDomListener(window, 'load', initialize);
+// google.maps.event.addDomListener(window, 'load', initialize);
 //maps///////////
 function initialize() {
 	geocoder = new google.maps.Geocoder();
@@ -197,6 +208,9 @@ function initialize() {
 
 	};
 	map = new google.maps.Map(mapCanvas, mapOptions); 
+
+
+
 	
 	google.maps.event.addListenerOnce(map, 'idle', function(){
 		myLibrary.renderMarkers(map);
