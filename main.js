@@ -1,7 +1,6 @@
 // $(document).on('ready', function() {
-  
-// });
 
+// });
 
 
 // To make a link smooth scroll to another section on the page, give the link the .page-scroll class and set the link target to a corresponding ID on the page.
@@ -50,7 +49,7 @@ Request.prototype.render = function(){
 	    var marker = this.marker;
 	    var contentString = request.date + '<br>' + request.name + '<br>' + request.area +  '<br>' + request.style +'<br>' + request.grades +'<br>' + request.contact ;
 		var infowindow = new google.maps.InfoWindow({
-		      content: contentString,		     
+		      content: contentString,
 		 });
   		 google.maps.event.addListener(this.marker, 'click', function() {
   		 console.log('clicked');
@@ -66,6 +65,8 @@ Request.prototype.render = function(){
 var RequestLibrary = function (name){
 	this.name = name ;
 	this.requests = [];
+	// if this is null, fall back to the requests list for display
+	this.requestsDisplay = null;
 	this.render();
 };
 
@@ -79,33 +80,40 @@ RequestLibrary.prototype.renderMarkers = function(map){
 	console.log(this.requests);
 	for (var i=0; i<this.requests.length; i++){
 		this.requests[i].renderMarker(map);
-	
+
 	}
 };
 
-RequestLibrary.prototype.renderFilter = function(stateOnly){	
+RequestLibrary.prototype.renderFilter = function(stateOnly){
 	function findState(Request){
 		if (Request.state === stateOnly){
 			return true;
 		}
 	}
-	var filtered = requestArray.filter(findState);
-	console.log(filtered);
-	$('.request-list').empty();
 
-	myLibrary.render(filtered);
+	// Once the filter is set up, we'll set a real value
+	// for the display list.
+	this.requestsDisplay = requestArray.filter(findState);
 
+	myLibrary.render();
+
+};
+
+// Helper for clearing out the filter. Try calling it from console!
+RequestLibrary.prototype.clearFilter = function () {
+	this.requestsDisplay = null;
+	this.render();
 };
 
 
 //Render Library to dom
 //pass a list to override via filtered
-RequestLibrary.prototype.render = function(listOverride) {
+RequestLibrary.prototype.render = function() {
 	if (this.el === undefined) {
 		this.el = $('#request-library-tpl')
 			.clone()
 			.attr('id', null);
-		
+
 		var originalLibrary = this;
 
 		this.el.find('.new-request-form').on('submit',function(e){
@@ -124,7 +132,7 @@ RequestLibrary.prototype.render = function(listOverride) {
 			//generate new request instance
 			var newRequest = new Request(requestDate, requestName, requestState, requestArea, requestStyle, requestGrades, requestContact);
 			originalLibrary.addRequest(newRequest);
-			
+
 			originalLibrary.renderMarkers(map);
 
 			//clear form after submitting
@@ -132,21 +140,20 @@ RequestLibrary.prototype.render = function(listOverride) {
 
 
 		});
-			
+
 	}
 	//change lib name to given
 	this.el.find('.library.name').text(this.name);
-	/////over ride
-	var requests = this.requests;
-		if(listOverride){
-			requests = listOverride;
-		}
 
+	// short-hand defaults: requests will try to set itself
+	// to the display list, but if it can't, it'll fall back to requests.
+	var requests = this.requestsDisplay || this.requests;
 	var requestElements = requests.map(function(request){
 		return request.render();
 	});
 
-	this.el.find('.request-list').append(requestElements);
+	// We now need to make sure the list is empty, just in case
+	this.el.find('.request-list').empty().append(requestElements);
 	return this.el;
 	};
 
@@ -170,10 +177,9 @@ RequestLibrary.prototype.render = function(listOverride) {
     myLibrary.addRequest(seventhRequest);
 	myLibrary.addRequest(eighthRequest);
 	var requestArray = myLibrary.requests;
-/////Render everything to body///// 
+/////Render everything to body/////
 	$('#contact').append(myLibrary.render());
 
-  
 //maps///////////
 var geocoder;
 var map;
@@ -204,7 +210,7 @@ function initialize() {
 		}]
 	};
 
-	map = new google.maps.Map(mapCanvas, mapOptions); 
+	map = new google.maps.Map(mapCanvas, mapOptions);
 
 	// Create the search box and link it to the UI element.
   	var input = /** @type {HTMLInputElement} */(
@@ -216,7 +222,7 @@ function initialize() {
 
  	google.maps.event.addListener(searchBox, 'places_changed', function() {
     var places = searchBox.getPlaces();
-    
+
     // sorted list//////
     var enteredplace = (places[0].formatted_address);
     var locationStrung = String(enteredplace);
@@ -228,7 +234,7 @@ function initialize() {
     if (places.length === 0) {
       return;
     }
- 
+
     //search function//
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0, place; place = places[i]; i++) {
@@ -261,13 +267,3 @@ function initialize() {
     // do something only the first time the map is loaded
 });
 }
-
-
-
-
-
-	
-
-
-
-
