@@ -1,3 +1,7 @@
+body{
+  font-family: 'Lato', sans-serif;
+}
+
 #templates {
 	display: none;
 }
@@ -5,13 +9,14 @@
 .padded-heading{
   margin-right: auto;
   margin-left: auto;
-  padding: 3em;
+  padding-bottom: 3em;
   width: 100%;
-
 }
+
+
 .form-control, input{
-	/*display: inline;*/
-	width: 20%;
+	
+	width: 30%;
 	height: 34px;
 }
 
@@ -19,25 +24,39 @@
   height:100px;
 }
 
+.submit{
+  margin-top:5px;
+  color:black;
+  
+}
+
+.new-request-form input, .new-request-form textarea{
+  color:black;
+  width:30%;
+}
 
 
 #map-canvas {
-        width: 800px;
-        height: 550px;      
+        width: 700px;
+        height: 500px;      
         margin-right: auto;
         float: none;
-        margin-bottom: 50px;
+        margin-bottom: 200px;
+        margin-left: 40px;
+        margin-top: 40px;
       }
 
 .new-request-form{
 	text-align: left;
-	margin-left: 3em;
-	
+	margin-left: 4em;	
+  margin-right: 0;
+  padding-right: 0;
+  padding-left: 4em;
 }
 
-/*#datetimepicker1{
-	width:152px;
-}*/
+.pad-right{
+  padding-right: 2em;
+}
 
 
 .float-right{
@@ -46,31 +65,70 @@
 
 }
 
-
-@media (min-width: 768px){  
+@media (min-width: 1047px){  
   #right {
     position: absolute;
-    top: 15em;
+    top: 8em;
     bottom: 0;
     right: 5em;
     overflow: none;
     overflow-y: scroll;
     width: 17%;
-
   }
+
 }
 
 #right {
-  height:600px;
+  height:500px;
   text-align: -webkit-auto;
 }
 
-ol li{
+.request-list li{
 	list-style-type: none;
-	border-bottom: 1px solid black;
-	overflow: hidden;
+	border-bottom: 1px solid #D8DFE6;
+	overflow: none;
+  color:#D8DFE6;
 }
 
+.request-list h5{
+    margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+
+.jared{
+  width:770.6px;
+  height: 515.2.6px;
+  float:right;
+  padding-right: 5em;
+}
+
+.navbar{
+  background-color: black;
+  color:#E3E8ED;
+
+}
+.find{
+  margin-left: 5px;
+}
+.navbar-brand{
+   color:blue;
+}
+
+/*//main nav link*/
+.navbar-default .navbar-brand {
+  color:#70ACDE;
+  font-family: 'Mohave';
+  font-size:400%;
+}
+
+/*nav links*/
+.navbar-default .navbar-nav>li>a {
+  color:#E3E8ED;
+  font-size: 130%;
+  border: 1px solid #E3E8ED;
+  margin-left: 10px;
+}
 
 
 

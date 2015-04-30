@@ -6,6 +6,7 @@
 // To make a link smooth scroll to another section on the page, give the link the .page-scroll class and set the link target to a corresponding ID on the page.
 
 
+
 //declare Request constructor
 var Request = function (date, name, state, area, style, grades, contact){
 	this.date = date;
@@ -34,6 +35,14 @@ Request.prototype.render = function(){
 	this.el.find('.request-contact').text(this.contact);
 	return this.el;
 };
+
+// Request.prototype.renderClimbers = function(){
+// 	if (this.el === undefined){
+// 		this.el = $('.climber-amount')
+// 		.clone()
+// 		.attr('id', null);
+// 	}
+// 	this.el.find('.request-date').text(this.date);
 
 
 // Function for adding a marker to the page.
@@ -66,21 +75,22 @@ var RequestLibrary = function (name){
 	this.name = name ;
 	this.requests = [];
 	// if this is null, fall back to the requests list for display
-	this.requestsDisplay = null;
+	this.requestsDisplay = null;	
 	this.render();
 };
 
 //add requests to Library
 RequestLibrary.prototype.addRequest = function(request){
 	this.requests.push(request);
+	var totalClimbers = (this.requests.length);
+	
+	$('.navbar').find('.climber-amount, h3').text(totalClimbers + ' people want to climb!');
 	this.render();
 };
 
 RequestLibrary.prototype.renderMarkers = function(map){
-	console.log(this.requests);
 	for (var i=0; i<this.requests.length; i++){
 		this.requests[i].renderMarker(map);
-
 	}
 };
 
@@ -94,6 +104,13 @@ RequestLibrary.prototype.renderFilter = function(stateOnly){
 	// Once the filter is set up, we'll set a real value
 	// for the display list.
 	this.requestsDisplay = requestArray.filter(findState);
+	var FilteredClimbers = requestArray.filter(findState).length;
+	console.log(FilteredClimbers);
+
+
+
+	
+	$('.navbar').find('.filtered-climber-amount').text(FilteredClimbers + ' in ' + stateOnly + '!');
 
 	myLibrary.render();
 
@@ -107,7 +124,7 @@ RequestLibrary.prototype.clearFilter = function () {
 
 
 //Render Library to dom
-//pass a list to override via filtered
+
 RequestLibrary.prototype.render = function() {
 	if (this.el === undefined) {
 		this.el = $('#request-library-tpl')
@@ -120,6 +137,8 @@ RequestLibrary.prototype.render = function() {
 			e.preventDefault();
 			console.log('submitted');
 
+			//scrolls back to map on click
+			$("html, body").animate({ scrollTop: 0 }, 600);
 			//grabbing values from inputs and changing the value of the form
 			var requestDate = $(this).find('[name = request-date]').val();
 			var requestName = $(this).find('[name = request-name]').val();
@@ -164,7 +183,7 @@ RequestLibrary.prototype.render = function() {
 	var fourthRequest = new Request ('05/20/2015','Strong Man', 'Colorado', 'rifle mountain park', 'Bouldering', 'v13', 'myspace.com/rockclimber33');
 	var fifthRequest = new Request ('05/05/2015','Adam Ondra', 'Nevada', 'Virgin River Gorge', 'Sport', '5.14 - 5.15', 'iscreamalot@hotmail.com');
 	var sixthRequest = new Request ('05/10/2015','Alex Honnold', 'California', 'Yosemite', 'Scary-Trad', '5.13 - 5.14', 'ropesareforbabies@gmail.com');
-	var seventhRequest = new Request ('04/30/2015','Chris Sharma', 'Nevada', 'Clark Canyon', 'Sport', '5.14 - 5.15', 'Sattelite Phone');
+	var seventhRequest = new Request ('04/30/2015','Chris Sharma', 'California', 'Clark Mountain', 'Sport', '5.14 - 5.15', 'Sattelite Phone');
 	var eighthRequest = new Request ('04/29/2015','Daniel Woods', 'Colorado', 'Rocky Mountain National Park', 'Bouldering', 'v15', 'iloverocks@gmail.com');
 
 	var myLibrary = new RequestLibrary('');
@@ -177,37 +196,25 @@ RequestLibrary.prototype.render = function() {
     myLibrary.addRequest(seventhRequest);
 	myLibrary.addRequest(eighthRequest);
 	var requestArray = myLibrary.requests;
-/////Render everything to body/////
+
+
+	/////Render everything to body/////
+
 	$('#contact').append(myLibrary.render());
 
 //maps///////////
 var geocoder;
 var map;
+
 function initialize() {
 	geocoder = new google.maps.Geocoder();
+
 
 	var mapCanvas = document.getElementById('map-canvas');
 	var mapOptions = {
 		zoom: 4,
 		center: new google.maps.LatLng(39.8282, -98.5795), // New York
-		styles: [{
-			"stylers": [{
-				"hue": "#007fff"
-			}, {
-				"saturation": 89
-			}]
-		}, {
-			"featureType": "water",
-			"stylers": [{
-				"color": "#ffffff"
-			}]
-		}, {
-			"featureType": "administrative.country",
-			"elementType": "labels",
-			"stylers": [{
-				"visibility": "off"
-			}]
-		}]
+		styles: [{"featureType":"water","elementType":"all","stylers":[{"hue":"#4EACDE"},{"saturation":10},{"lightness":10},{"visibility":"simplified"}]},{"featureType":"landscape","elementType":"all","stylers":[{"hue":"#FFFFFF"},{"saturation":-100},{"lightness":100},{"visibility":"simplified"}]},{"featureType":"landscape.man_made","elementType":"all","stylers":[]},{"featureType":"landscape.natural","elementType":"all","stylers":[]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"hue":"#ffffff"},{"saturation":-100},{"lightness":100},{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"hue":"#333333"},{"saturation":-100},{"lightness":-69},{"visibility":"simplified"}]},{"featureType":"poi.attraction","elementType":"geometry","stylers":[{"hue":"#ffffff"},{"saturation":-100},{"lightness":100},{"visibility":"off"}]},{"featureType":"administrative.locality","elementType":"geometry","stylers":[{"hue":"#ffffff"},{"saturation":0},{"lightness":100},{"visibility":"off"}]},{"featureType":"poi.government","elementType":"geometry","stylers":[{"hue":"#ffffff"},{"saturation":-100},{"lightness":100},{"visibility":"off"}]}]
 	};
 
 	map = new google.maps.Map(mapCanvas, mapOptions);
@@ -215,7 +222,7 @@ function initialize() {
 	// Create the search box and link it to the UI element.
   	var input = /** @type {HTMLInputElement} */(
       document.getElementById('pac-input'));
-  	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+  	map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
     var searchBox = new google.maps.places.SearchBox(
     /** @type {HTMLInputElement} */(input));
 
@@ -223,12 +230,12 @@ function initialize() {
  	google.maps.event.addListener(searchBox, 'places_changed', function() {
     var places = searchBox.getPlaces();
 
-    // sorted list//////
+    // sorted list by state on search//////
     var enteredplace = (places[0].formatted_address);
     var locationStrung = String(enteredplace);
     var split = locationStrung.split(',');
     var stateOnly= split[0];
-    console.log(stateOnly);
+    console.log(places);
   	myLibrary.renderFilter(stateOnly);
 
     if (places.length === 0) {
@@ -250,8 +257,8 @@ function initialize() {
     }
     // Don't zoom in too far on only one marker
     if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
-       var extendPoint1 = new google.maps.LatLng(bounds.getNorthEast().lat() + 0.08, bounds.getNorthEast().lng() + 0.08);
-       var extendPoint2 = new google.maps.LatLng(bounds.getNorthEast().lat() - 0.08, bounds.getNorthEast().lng() - 0.08);
+       var extendPoint1 = new google.maps.LatLng(bounds.getNorthEast().lat() + 1.5, bounds.getNorthEast().lng() + 1.5);
+       var extendPoint2 = new google.maps.LatLng(bounds.getNorthEast().lat() - 1.5, bounds.getNorthEast().lng() - 1.5);
        bounds.extend(extendPoint1);
        bounds.extend(extendPoint2);
     }
